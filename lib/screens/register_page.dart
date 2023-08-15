@@ -1,10 +1,15 @@
+import 'dart:async';
+
 import 'package:ems/const/custom_styles.dart';
+import 'package:ems/screens/Dashbord.dart';
 import 'package:ems/screens/screen.dart';
 import 'package:flutter/material.dart';
 import '../widgets/widget.dart';
 import 'package:flutter_svg_provider/flutter_svg_provider.dart';
 import '../constants.dart';
 import 'package:flutter/cupertino.dart';
+import 'package:cloud_firestore/cloud_firestore.dart';
+import 'package:quickalert/quickalert.dart';
 
 const List<String> list = <String>[
   'Surat',
@@ -12,6 +17,13 @@ const List<String> list = <String>[
   'Ahmadabad',
   'Navsari',
   'Vapi'
+];
+
+const List<String> delist = <String>[
+  'Project Manager',
+  'Assistant Manager',
+  'Sr. Developer',
+  'Jr. Developer'
 ];
 
 class Registration extends StatefulWidget {
@@ -22,10 +34,13 @@ class Registration extends StatefulWidget {
 }
 
 class _RegistrationState extends State<Registration> {
-  TextEditingController txtuname = TextEditingController();
-  TextEditingController txtemail = TextEditingController();
-  TextEditingController txtpass = TextEditingController();
-  TextEditingController txtcontact = TextEditingController();
+  TextEditingController EmpId = TextEditingController();
+  TextEditingController Empname = TextEditingController();
+  TextEditingController Empemail = TextEditingController();
+  TextEditingController Emppass = TextEditingController();
+  TextEditingController Empcontact = TextEditingController();
+  TextEditingController EmpDesignatiob = TextEditingController();
+  TextEditingController Empsalary = TextEditingController();
 
   var gender = null;
   var hobby = false;
@@ -34,6 +49,7 @@ class _RegistrationState extends State<Registration> {
   String? email, Pass;
 
   String dropdownValue = list.first;
+  String designationvalue = delist.first;
 
   var dateController = TextEditingController();
   var timeController = TextEditingController();
@@ -41,6 +57,44 @@ class _RegistrationState extends State<Registration> {
 
   @override
   Widget build(BuildContext context) {
+    final CollectionReference _tblEmployee =
+        FirebaseFirestore.instance.collection('employee');
+
+    Future<void> _Add() async {
+      print("Hello");
+      String id = EmpId.text;
+      String name = Empname.text;
+      String contact = Empcontact.text;
+      String Gender = gender.toString();
+      String email = Empemail.text;
+      String password = Emppass.text;
+      String Designation = EmpDesignatiob.text;
+      String salary = Empsalary.text;
+      String city = dropdownValue.toString();
+      String designation = designationvalue.toString();
+      bool status = false;
+      print("By");
+      // String startDate = StartDateController.text;
+      // final double? price = double.tryParse(StartDateController.text.toString());
+      // String city = empc
+      // String BOD =
+
+      await _tblEmployee.add({
+        "Eno": id,
+        "Ename": name,
+        "Econtactno": contact,
+        "Egender": Gender,
+        "Eemail": email,
+        "Epassword": password,
+        "Ecity": city,
+        "Edesignation": designation,
+        "Esalary": salary,
+        "Estatus": status
+      });
+      //await _tblProduct.doc(documentSnapshot.id).
+      //update({"name":name,"price":price});
+    }
+
     return Scaffold(
       appBar: AppBar(
         title: Text("Registeration Page"),
@@ -76,6 +130,7 @@ class _RegistrationState extends State<Registration> {
                   height: 50,
                 ),
                 TextField(
+                  controller: EmpId,
                   keyboardType: TextInputType.number,
                   maxLength: 10,
                   decoration: InputDecoration(
@@ -89,7 +144,7 @@ class _RegistrationState extends State<Registration> {
                   height: 25,
                 ),
                 TextField(
-                  controller: txtuname,
+                  controller: Empname,
                   decoration: InputDecoration(
                       prefixIcon: Icon(Icons.account_circle),
                       label: Text("Enter Name"),
@@ -101,7 +156,7 @@ class _RegistrationState extends State<Registration> {
                   height: 25,
                 ),
                 TextField(
-                  controller: txtcontact,
+                  controller: Empcontact,
                   keyboardType: TextInputType.phone,
                   maxLength: 10,
                   decoration: InputDecoration(
@@ -138,7 +193,7 @@ class _RegistrationState extends State<Registration> {
                   height: 25,
                 ),
                 TextField(
-                  controller: txtemail,
+                  controller: Empemail,
                   keyboardType: TextInputType.emailAddress,
                   decoration: InputDecoration(
                       prefixIcon: Icon(Icons.email),
@@ -152,7 +207,7 @@ class _RegistrationState extends State<Registration> {
                 ),
                 TextField(
                   obscureText: true,
-                  controller: txtpass,
+                  controller: Emppass,
                   decoration: InputDecoration(
                       prefixIcon: Icon(Icons.remove_red_eye_sharp),
                       label: Text("Enter Password"),
@@ -163,27 +218,60 @@ class _RegistrationState extends State<Registration> {
                 SizedBox(
                   height: 25,
                 ),
-                DropdownButton<String>(
-                  value: dropdownValue,
-                  icon: const Icon(Icons.arrow_downward),
-                  elevation: 16,
-                  style: const TextStyle(color: Colors.deepPurple),
-                  underline: Container(
-                    height: 2,
-                    color: Colors.deepPurpleAccent,
+                Container(
+                  width: double.infinity,
+                  child: DropdownButton<String>(
+                    value: dropdownValue,
+                    icon: const Icon(Icons.arrow_downward),
+                    elevation: 16,
+                    style: const TextStyle(color: Colors.black),
+                    underline: Container(
+                      height: 2,
+                      color: Colors.black,
+                    ),
+                    onChanged: (String? value) {
+                      // This is called when the user selects an item.
+                      setState(() {
+                        dropdownValue = value!;
+                        print(value);
+                      });
+                    },
+                    items: list.map<DropdownMenuItem<String>>((String value) {
+                      return DropdownMenuItem<String>(
+                        value: value,
+                        child: Text(value),
+                      );
+                    }).toList(),
                   ),
-                  onChanged: (String? value) {
-                    // This is called when the user selects an item.
-                    setState(() {
-                      dropdownValue = value!;
-                    });
-                  },
-                  items: list.map<DropdownMenuItem<String>>((String value) {
-                    return DropdownMenuItem<String>(
-                      value: value,
-                      child: Text(value),
-                    );
-                  }).toList(),
+                ),
+                SizedBox(
+                  height: 25,
+                ),
+                Container(
+                  width: double.infinity,
+                  child: DropdownButton<String>(
+                    value: designationvalue,
+                    icon: const Icon(Icons.arrow_downward),
+                    elevation: 16,
+                    style: const TextStyle(color: Colors.black),
+                    underline: Container(
+                      height: 2,
+                      color: Colors.black,
+                    ),
+                    onChanged: (String? value) {
+                      // This is called when the user selects an item.
+                      setState(() {
+                        designationvalue = value!;
+                        print(value);
+                      });
+                    },
+                    items: delist.map<DropdownMenuItem<String>>((String value) {
+                      return DropdownMenuItem<String>(
+                        value: value,
+                        child: Text(value),
+                      );
+                    }).toList(),
+                  ),
                 ),
                 SizedBox(
                   height: 25,
@@ -206,21 +294,23 @@ class _RegistrationState extends State<Registration> {
                 SizedBox(
                   height: 25,
                 ),
+                // TextField(
+                //   controller: EmpDesignatiob,
+                //   // // style: kBodyText.copyWith(color: Colors.white),
+                //   // style: kBodyText.copyWith(color: Colors.white),
+                //   decoration: InputDecoration(
+                //       prefixIcon: Icon(Icons.accessibility),
+                //       labelText: "Enter Designation",
+                //       hintText: "Enter Designation",
+                //       border: OutlineInputBorder(
+                //         borderRadius: BorderRadius.circular(20),
+                //       )),
+                // ),
+                // SizedBox(
+                //   height: 25,
+                // ),
                 TextField(
-                  // // style: kBodyText.copyWith(color: Colors.white),
-                  // style: kBodyText.copyWith(color: Colors.white),
-                  decoration: InputDecoration(
-                      prefixIcon: Icon(Icons.accessibility),
-                      labelText: "Enter Designation",
-                      hintText: "Enter Designation",
-                      border: OutlineInputBorder(
-                        borderRadius: BorderRadius.circular(20),
-                      )),
-                ),
-                SizedBox(
-                  height: 25,
-                ),
-                TextField(
+                  controller: Empsalary,
                   keyboardType: TextInputType.number,
                   maxLength: 5,
                   decoration: InputDecoration(
@@ -269,7 +359,15 @@ class _RegistrationState extends State<Registration> {
                 ),
                 MyTextButton(
                   buttonName: 'Register',
-                  onTap: () {},
+                  onTap: () {
+                    _Add();
+                    Navigator.pushReplacement(context,
+                        MaterialPageRoute(builder: (context) => SignInPage()));
+                    QuickAlert.show(
+                      context: context,
+                      type: QuickAlertType.success,
+                    );
+                  },
                   bgColor: Colors.black,
                   textColor: Colors.white,
                 ),
