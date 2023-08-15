@@ -1,8 +1,19 @@
 import 'package:ems/Splash_Screen.dart';
 import 'package:ems/screens/screen.dart';
 import 'package:flutter/material.dart';
+import 'package:firebase_core/firebase_core.dart';
 
-void main() {
+void main() async {
+  WidgetsFlutterBinding.ensureInitialized();
+  await Firebase.initializeApp(
+    options: FirebaseOptions(
+      apiKey: "AIzaSyDnqjb6_jnrjw16Murlprruoj0X1yG84PQ",
+      appId: "1:608824326509:android:225d7d60158b059c7ac264",
+      messagingSenderId: "608824326509",
+      projectId: "emsystem-3f45d",
+    ),
+  );
+
   runApp(const MyApp());
 }
 
